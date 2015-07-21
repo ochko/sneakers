@@ -16,7 +16,10 @@ class Sneakers::Queue
   # :ack
   #
   def subscribe(worker)
-    @bunny = Bunny.new(@opts[:amqp], :vhost => @opts[:vhost], :heartbeat => @opts[:heartbeat], :logger => Sneakers::logger)
+    conn_opts = {:heartbeat => @opts[:heartbeat], :logger => Sneakers::logger}
+    conn_opts.merge!(@opts[:connection] || {@opts[:amqp], :vhost => @opts[:vhost]})
+
+    @bunny = Bunny.new(conn_opts)
     @bunny.start
 
     @channel = @bunny.create_channel
